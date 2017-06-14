@@ -33,7 +33,7 @@ def add_cookie():
 
 # 模拟浏览器
 def browser_post(url, para):
-    print(para)
+    # print(para)
     user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
     headers = {'user-agent': user_agent}
     data = bytes(urllib.parse.urlencode(para), encoding='utf-8')

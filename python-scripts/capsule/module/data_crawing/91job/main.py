@@ -4,6 +4,8 @@
 import net_utils
 import person_bean
 import dict_utils
+import data_instance
+
 # import js_utils
 
 # 全局数据容器
@@ -16,6 +18,16 @@ dataHolder = {
     },
     'doc': {
         'doc_1': ''
+    },
+    'page': {
+        'current': 1
+    },
+    'form': {
+        '__EVENTTARGET': 'GridView1',
+        '__EVENTARGUMENT': 'Page$2',
+        '__LASTFOCUS': '',
+        '__VIEWSTATE': '',
+        '__EVENTVALIDATION': ''
     }
 }
 
@@ -30,20 +42,20 @@ def init_load():
 def resp_parser():
     dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
     table = dataHolder['doc']['doc_1'].find('table', id='GridView1')
-    table_parser_test(table)
     # person = person_bean.Person("haha")
     # person.educational_experience = "西安邮电大学-->北京大学"
     # print(dict_utils.convert_to_dict(person))
     return
 
+def print_part_line():
+    print('--------------------------------------------------------------------')
+    print('--------------------------------------------------------------------')
+    return
+
+# 数据解析
 def table_parser(resp):
     soup = net_utils.resp_soup(resp)
     table = soup.find('table', id='GridView1')
-    table_parser_test(table)
-    return
-
-
-def table_parser_test(table):
     base_url = 'http://job.91boshi.net/'
     for tr in table.findAll(class_='person_info'):
         for doc in tr.findAll(class_='person_info_r_1'):
@@ -59,23 +71,45 @@ def table_parser_test(table):
         print('\n')
     return
 
-def page_form():
-    dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
-    form = dataHolder['doc']['doc_1'].find(id="form1")
+# 表单提交
+def form_sbmit():
+    if dataHolder['page']['current'] == 1:
+        table_parser(dataHolder['resp']['pageView_1'])
+        return
+
     paras = {
         '__EVENTTARGET': 'GridView1',
-        '__EVENTARGUMENT': 'Page$3',
+        '__EVENTARGUMENT': fmt_page_current(),
         '__LASTFOCUS': '',
-        '__VIEWSTATE': form.find('input', id='__VIEWSTATE')['value'],
-        '__EVENTVALIDATION': form.find('input', id='__EVENTVALIDATION')['value']
+        '__VIEWSTATE': dataHolder['form']['__VIEWSTATE'],
+        '__EVENTVALIDATION': dataHolder['form']['__EVENTVALIDATION']
     }
     form_resp = net_utils.browser_post('http://job.91boshi.net/personnellist.aspx', paras)
-    table_parser(form_resp.read().decode("utf-8"))
+    # print(form_resp.read().decode("gbk"))
+    dataHolder['resp']['pageView_1'] = form_resp.read().decode("utf-8")
+    table_parser(dataHolder['resp']['pageView_1'])
     return
+
+
+def fmt_page_current():
+    return 'Page$' + str(dataHolder['page']['current'])
+
+
+# 循环解析
+def loop_controller(top_limit):
+    while dataHolder['page']['current'] < top_limit:
+        print("开始解析第" + str(dataHolder['page']['current']) + "页的数据：")
+        dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
+        form = dataHolder['doc']['doc_1'].find(id="form1")
+        dataHolder['form']['__VIEWSTATE'] = form.find('input', id='__VIEWSTATE')['value']
+        dataHolder['form']['__EVENTVALIDATION'] = form.find('input', id='__EVENTVALIDATION')['value']
+        form_sbmit()
+        print_part_line()
+        dataHolder['page']['current'] = dataHolder['page']['current'] + 1
+    return
+
 
 # 主函数
 if __name__ == '__main__':
     init_load()
-    # resp_parser()
-    page_form()
-    # resp_parser()
+    loop_controller(15)

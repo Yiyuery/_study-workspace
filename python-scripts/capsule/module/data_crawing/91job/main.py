@@ -28,7 +28,8 @@ dataHolder = {
         '__LASTFOCUS': '',
         '__VIEWSTATE': '',
         '__EVENTVALIDATION': ''
-    }
+    },
+    'persons': set([])
 }
 
 
@@ -47,6 +48,7 @@ def resp_parser():
     # print(dict_utils.convert_to_dict(person))
     return
 
+# 绘制分割线
 def print_part_line():
     print('--------------------------------------------------------------------')
     print('--------------------------------------------------------------------')
@@ -71,6 +73,25 @@ def table_parser(resp):
         print('\n')
     return
 
+def init_person():
+    basic_info = {
+        'name': '',
+        'nation': '',
+        'age': '',
+        'marriage': '',
+        'education': '',
+        'household': '',
+        'address': '',
+        'height': '',
+        'weight': '',
+        'memType': '',
+        'post_intention': '',
+        'salary_require': '',
+        'major': ''
+    }
+    person = person_bean()
+    return
+
 # 表单提交
 def form_sbmit():
     if dataHolder['page']['current'] == 1:
@@ -91,13 +112,14 @@ def form_sbmit():
     return
 
 
+# 格式化页码参数
 def fmt_page_current():
     return 'Page$' + str(dataHolder['page']['current'])
 
 
 # 循环解析
-def loop_controller(top_limit):
-    while dataHolder['page']['current'] < top_limit:
+def loop_controller(endPageNum):
+    while dataHolder['page']['current'] < endPageNum:
         print("开始解析第" + str(dataHolder['page']['current']) + "页的数据：")
         dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
         form = dataHolder['doc']['doc_1'].find(id="form1")

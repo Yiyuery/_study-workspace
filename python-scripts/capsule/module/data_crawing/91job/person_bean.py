@@ -1,9 +1,24 @@
 # person_bean.py
 import json
+
 # 自定义类
 class Person:
     # 基本信息
-    basic_info = ""
+    basic_info = {
+        'name': '',
+        'nation': '',
+        'age': '',
+        'marriage': '',
+        'education': '',
+        'household': '',
+        'address': '',
+        'height': '',
+        'weight': '',
+        'memType': '',
+        'post_intention': '',
+        'salary_require': '',
+        'major': ''
+    }
     # 就业意向
     employment_intention = ""
     # 工作特长

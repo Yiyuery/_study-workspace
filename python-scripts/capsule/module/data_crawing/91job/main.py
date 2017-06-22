@@ -1,12 +1,10 @@
 # coding='utf-8'
 # author:Yiyuery
+# TODO: 爬取91job网站人员简历信息
 
 import net_utils
 import person_bean
 import dict_utils
-import data_instance
-
-# import js_utils
 
 # 全局数据容器
 dataHolder = {
@@ -29,23 +27,13 @@ dataHolder = {
         '__VIEWSTATE': '',
         '__EVENTVALIDATION': ''
     },
-    'persons': set([])
+    'persons': []
 }
 
 
 # 初始化加載
 def init_load():
     dataHolder['resp']['pageView_1'] = net_utils.do_post(dataHolder['request']['url'], 'true')
-    return
-
-
-# 数据解析器
-def resp_parser():
-    dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
-    table = dataHolder['doc']['doc_1'].find('table', id='GridView1')
-    # person = person_bean.Person("haha")
-    # person.educational_experience = "西安邮电大学-->北京大学"
-    # print(dict_utils.convert_to_dict(person))
     return
 
 # 绘制分割线
@@ -60,41 +48,35 @@ def table_parser(resp):
     table = soup.find('table', id='GridView1')
     base_url = 'http://job.91boshi.net/'
     for tr in table.findAll(class_='person_info'):
+        person_basic = {}
+        person_advanced = {}
+        base_info = []
         for doc in tr.findAll(class_='person_info_r_1'):
             # 默认第一个节点
             print(doc.find('td').getText())
+            person_basic['name'] = doc.find('td').getText()
             # 根据属性特征获取相邻节点信息
             print(doc.find('td', attrs={'align': 'right'}).getText())
         for doc in tr.findAll(class_='person_info_r_2'):
             print(doc.find('a').getText())
+            person_basic = person_bean.parser_person_basic(person_basic, doc.find('a').getText().split('，'))
             print(base_url + doc.find('a').get('href'))
         for doc in tr.select('.person_info_r_3 td'):
-            print(doc.getText())
-        print('\n')
+            base_info.append(doc.getText())
+        # 封装 人员基本信息
+        person_basic = person_bean.parser_person_base_info(person_basic, base_info)
+        print(person_basic)
     return
 
-def init_person():
-    basic_info = {
-        'name': '',
-        'nation': '',
-        'age': '',
-        'marriage': '',
-        'education': '',
-        'household': '',
-        'address': '',
-        'height': '',
-        'weight': '',
-        'memType': '',
-        'post_intention': '',
-        'salary_require': '',
-        'major': ''
-    }
-    person = person_bean()
+def save_person(p):
+    person = person_bean.Person(p)
+    dataHolder['persons'].append(person)
     return
 
 # 表单提交
 def form_sbmit():
     if dataHolder['page']['current'] == 1:
+        # 第1页直接解析
         table_parser(dataHolder['resp']['pageView_1'])
         return
 
@@ -119,7 +101,7 @@ def fmt_page_current():
 
 # 循环解析
 def loop_controller(endPageNum):
-    while dataHolder['page']['current'] < endPageNum:
+    while dataHolder['page']['current'] <= endPageNum:
         print("开始解析第" + str(dataHolder['page']['current']) + "页的数据：")
         dataHolder['doc']['doc_1'] = net_utils.resp_soup(dataHolder['resp']['pageView_1'])
         form = dataHolder['doc']['doc_1'].find(id="form1")
@@ -134,4 +116,4 @@ def loop_controller(endPageNum):
 # 主函数
 if __name__ == '__main__':
     init_load()
-    loop_controller(15)
+    loop_controller(1)

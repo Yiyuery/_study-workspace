@@ -53,20 +53,37 @@ def table_parser(resp):
         base_info = []
         for doc in tr.findAll(class_='person_info_r_1'):
             # 默认第一个节点
-            print(doc.find('td').getText())
+            # print(doc.find('td').getText())
             person_basic['name'] = doc.find('td').getText()
             # 根据属性特征获取相邻节点信息
-            print(doc.find('td', attrs={'align': 'right'}).getText())
+            # print(doc.find('td', attrs={'align': 'right'}).getText()) 简历发布时间
         for doc in tr.findAll(class_='person_info_r_2'):
-            print(doc.find('a').getText())
+            # print(doc.find('a').getText())
             person_basic = person_bean.parser_person_basic(person_basic, doc.find('a').getText().split('，'))
-            print(base_url + doc.find('a').get('href'))
+            # print(base_url + doc.find('a').get('href'))
+            ## person_advanced = person_advanced_parser(base_url + doc.find('a').get('href'))
         for doc in tr.select('.person_info_r_3 td'):
             base_info.append(doc.getText())
         # 封装 人员基本信息
         person_basic = person_bean.parser_person_base_info(person_basic, base_info)
         print(person_basic)
     return
+
+# 人员简介解析
+def person_advanced_parser():
+    _url = 'http://job.91boshi.net/person.aspx?id=26260'
+    resp = net_utils.do_post(_url,'true')
+    soup = net_utils.resp_soup(resp)
+    container = soup.find(id='person_div')
+    for doc in container.findAll(class_='person_div_c_1'):
+            print(doc.find('td').getText())
+
+
+    for doc in container.findAll(class_='person_div_c_2'):
+        print(doc.find('td').getText())
+
+
+
 
 def save_person(p):
     person = person_bean.Person(p)
@@ -115,5 +132,6 @@ def loop_controller(endPageNum):
 
 # 主函数
 if __name__ == '__main__':
-    init_load()
-    loop_controller(1)
+    # init_load()
+    # loop_controller(1)
+    person_advanced_parser()

@@ -1,6 +1,7 @@
 # person_bean.py
 import json
 
+
 # 自定义人员类
 class Person(object):
     # 基本信息
@@ -40,28 +41,13 @@ class Person(object):
     }
 
     # 链式操作写入数据
-    # 重写构造函数
-    def __init__(self, basic):  # 写入基本信息
+    def _set_basic(self, basic):
         self._person_basic = basic
         return self
 
-    @property  # 读
-    def advanced(self):
-        return self._person_advanced
-
-    @advanced.setter  # 写入高级信息
-    def advanced(self, value):
-        self._person_advanced = value
+    def _set_advanced(self, advanced):
+        self._person_advanced = advanced
         return self
-
-    @advanced.deleter  # 删除
-    def advanced(self):
-        del self._person_advanced
-
-    # 自定义tostring方法
-    def tostring(self):
-        print(self.person_basic)
-        print(self.person_advanced)
 
 
 # 信息解析 女，汉族，27岁，未婚，博士及以上学历，浙江省户籍，现住国外，身高168cm，体重48kg
@@ -93,9 +79,11 @@ def parser_person_base_info(person_basic, arr):
     return person_basic
 
 
-# @Test
+# Test
 if __name__ == '__main__':
-    info = {
+    #  新建对象 Person
+    person = Person()
+    basic = {
         'name': '1',
         'nation': '2',
         'age': '3',
@@ -110,8 +98,26 @@ if __name__ == '__main__':
         'salary_require': '12',
         'major': '13'
     }
-    person = Person(info)
-    print(person.tostring())
+    advanced = {
+        # 就业意向
+        'employment_intention': '14',
+        # 工作特长
+        'work_specialty': '15',
+        # 教育经历
+        'educational_experience': '16',
+        # 工作经历
+        'work_experience': '17',
+        # 特长
+        'special_skill': '18',
+        # 职业目标
+        'career_goals': '19',
+        # 自我介绍
+        'self_introduction': '20'
+    }
+    person._set_basic(basic)._set_advanced(advanced)
+    # 打印对象内部元素
+    print(person._person_basic)
+    print(person._person_advanced)
     # 类型帮助信息
     print('类型帮助信息: ', Person.__doc__)
     # 类型名称
@@ -123,4 +129,4 @@ if __name__ == '__main__':
     # 类型所在模块
     print('类型所在模块:', Person.__module__)
     # 实例类型
-    print('实例类型:', Person(object).__class__)
+    print('实例类型:', Person().__class__)

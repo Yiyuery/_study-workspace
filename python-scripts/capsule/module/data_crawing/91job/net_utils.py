@@ -5,13 +5,16 @@ import http.cookiejar
 import bs4
 from bs4 import BeautifulSoup, Comment
 
+
 def hello():
     print("hello, Master! I'm net_utils!")
     return
 
+
 # 网页解析
 def resp_soup(resp):
     return BeautifulSoup(resp, "lxml")
+
 
 # post 请求
 def do_post(_url, fmt):
@@ -22,6 +25,7 @@ def do_post(_url, fmt):
         rel = rel.decode("utf-8")
     return rel
 
+
 # 添加cookie
 def add_cookie():
     cookie = http.cookiejar.CookieJar()
@@ -31,6 +35,7 @@ def add_cookie():
     urllib.request.install_opener(opener)
     return
 
+
 # 模拟浏览器
 def browser_post(url, para):
     # print(para)
@@ -39,5 +44,5 @@ def browser_post(url, para):
     data = bytes(urllib.parse.urlencode(para), encoding='utf-8')
     req = urllib.request.Request(url, data, headers)
     resp = urllib.request.urlopen(req)
-    #print("模拟浏览器返回结果：" + resp.read().decode("utf-8"))
+    # print("模拟浏览器返回结果：" + resp.read().decode("utf-8"))
     return resp
